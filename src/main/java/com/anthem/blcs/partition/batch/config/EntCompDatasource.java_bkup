@@ -1,0 +1,47 @@
+package com.anthem.blcs.partition.batch.config;
+
+import javax.sql.DataSource;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+/**
+ * The Class EntCompDatasource.
+ */
+@Lazy
+@Configuration
+@ConfigurationProperties("spring.blcs.datasource")
+public class EntCompDatasource extends DatasourceConfiguration {
+
+    /**
+     * Ent comp data source.
+     *
+     * @return the data source
+     */
+    @Bean(name = "ascsDS")
+    public DataSource entCompDatasource() {
+        //Hikari for connection pooling
+        final HikariDataSource blcsDataSource = new HikariDataSource();
+        blcsDataSource.setDriverClassName(getDriverClassName());
+        blcsDataSource.setJdbcUrl(getUrl());
+        blcsDataSource.setUsername(getUsername());
+        blcsDataSource.setPassword(getPassword());
+        blcsDataSource.setMaximumPoolSize(getPoolSize());
+        blcsDataSource.setConnectionTimeout(getConnectionTimeout());
+        blcsDataSource.setConnectionTestQuery(getTestQuery());
+        
+        // Added if - Just in case it is not set in CONFIG REPO for individual services 
+        if(getIdleTimeout() != 0) {
+            blcsDataSource.setIdleTimeout(getIdleTimeout());
+        }
+        
+        if(getMinimumIdle() != 0) {
+            blcsDataSource.setMinimumIdle(getMinimumIdle());
+        }
+        return blcsDataSource;
+    }
+}
